@@ -4,9 +4,9 @@ from mcp.server.auth.settings import AuthSettings
 from auth0_provider import Auth0Provider
 
 # 1) Auth0 tenant (no path, no protocol)
-AUTH0_DOMAIN    = "dev-ra0g3i6fh7x0s3ti.us.auth0.com" # Dein Auth0 Domain
+AUTH0_DOMAIN = "dev-ra0g3i6fh7x0s3ti.us.auth0.com"  # Dein Auth0 Domain
 # 2) Must match the “Identifier” field on your Auth0 API
-API_AUD         = "http://localhost:3000/mcp" # Deine API Audience
+API_AUD = "http://localhost:3000/mcp"  # Deine API Audience
 
 # Gemeinsamer Auth0 Provider für beide Subserver
 auth0_provider = Auth0Provider(AUTH0_DOMAIN, API_AUD)
@@ -14,43 +14,45 @@ auth0_provider = Auth0Provider(AUTH0_DOMAIN, API_AUD)
 # --- Subserver 1: Addier-Service (benötigt 'read:add') ---
 add_scopes = ["read:add"]
 add_auth_settings = AuthSettings(
-    issuer_url=f"https://{AUTH0_DOMAIN}/",
-    required_scopes=add_scopes
+    issuer_url=f"https://{AUTH0_DOMAIN}/", required_scopes=add_scopes
 )
 add_server = FastMCP(
     name="AddService",
     stateless_http=True,
     auth_server_provider=auth0_provider,
-    auth=add_auth_settings
+    auth=add_auth_settings,
 )
+
 
 @add_server.tool(description="Add two integers")
 def add(a: int, b: int) -> int:
     print(f"Executing add tool with a={a}, b={b}")
     return a + b
 
+
 # --- Subserver 2: Delete-Service (benötigt 'admin:delete') ---
 delete_scopes = ["admin:delete"]
 delete_auth_settings = AuthSettings(
-    issuer_url=f"https://{AUTH0_DOMAIN}/",
-    required_scopes=delete_scopes
+    issuer_url=f"https://{AUTH0_DOMAIN}/", required_scopes=delete_scopes
 )
 delete_server = FastMCP(
     name="DeleteService",
     stateless_http=True,
     auth_server_provider=auth0_provider,
-    auth=delete_auth_settings
+    auth=delete_auth_settings,
 )
+
 
 @delete_server.tool(description="Simulate deleting an item")
 def delete_item(item_id: str) -> str:
     print(f"Executing delete_item tool for item_id={item_id}")
     return f"Item '{item_id}' was 'deleted' successfully."
 
+
 # --- Hauptserver: Komposition ---
 main_mcp = FastMCP(
     name="MainAppServer",
-    stateless_http=True
+    stateless_http=True,
     # Der Hauptserver selbst hat keine Auth-Settings,
     # da die Authentifizierung von den Subservern gehandhabt wird.
 )
@@ -65,8 +67,4 @@ if __name__ == "__main__":
     print(f"AddService requires scopes: {add_scopes}")
     print(f"DeleteService requires scopes: {delete_scopes}")
     print(f"Auth0 Provider configured for domain: {AUTH0_DOMAIN}, audience: {API_AUD}")
-    main_mcp.run(
-        transport="streamable-http",
-        host="127.0.0.1",
-        port=3000
-    )
+    main_mcp.run(transport="streamable-http", host="127.0.0.1", port=3000)

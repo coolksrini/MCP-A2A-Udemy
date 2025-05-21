@@ -1,10 +1,12 @@
 from mcp.server.fastmcp import FastMCP
 
-mcp = FastMCP("Demo-Server")
+mcp = FastMCP("Demo Server")
 
-@mcp.tool(description="Addiere zwei ganze Zahlen")
+
+@mcp.tool(description="Add two integers")
 def add(a: int, b: int) -> int:
     return a + b
+
 
 if __name__ == "__main__":
     mcp.run(transport="streamable-http")

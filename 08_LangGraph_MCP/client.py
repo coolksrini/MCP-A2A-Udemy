@@ -9,17 +9,20 @@ from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.prebuilt import create_react_agent
 from langchain_core.messages import AIMessage
 
+
 async def main():
     # 1) LLM-Instanz
     llm = ChatOpenAI(model="gpt-4o-mini")
 
     # 2) MultiServerMCPClient konfigurieren
-    client = MultiServerMCPClient({
-        "weather": {
-            "transport": "streamable_http",
-            "url":      "http://127.0.0.1:3000/mcp"
+    client = MultiServerMCPClient(
+        {
+            "weather": {
+                "transport": "streamable_http",
+                "url": "http://127.0.0.1:3000/mcp",
+            }
         }
-    })
+    )
 
     tools = await client.get_tools()
     agent = create_react_agent("openai:gpt-4o-mini", tools)
@@ -35,6 +38,7 @@ async def main():
             break
     else:
         print("Keine AIMessage gefunden.")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

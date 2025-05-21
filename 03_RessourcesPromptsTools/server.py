@@ -8,19 +8,23 @@ _FAKE_DB = {
     "pancakes": "Pancakes\n• Flour\n• Milk\n• Eggs\n…",
 }
 
+
 @mcp.resource("recipe://{dish}")
 def get_recipe(dish: str) -> str:
     """Returns the recipe for the specified dish."""
     return _FAKE_DB.get(dish, f"No recipe found for {dish!r}.")
+
 
 @mcp.resource("recipes://list")
 def list_recipes() -> str:
     """Returns a comma-separated list of all available recipes."""
     return ", ".join(sorted(_FAKE_DB))
 
+
 @mcp.tool(description="Doubles an integer.")
 def double(n: int) -> int:
     return n * 2
+
 
 @mcp.prompt()
 def review_recipe(recipe: str) -> list[base.Message]:
@@ -28,6 +32,7 @@ def review_recipe(recipe: str) -> list[base.Message]:
         base.UserMessage("Please review this recipe:"),
         base.UserMessage(recipe),
     ]
+
 
 if __name__ == "__main__":
     mcp.run(transport="streamable-http")

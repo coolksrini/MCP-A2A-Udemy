@@ -1,12 +1,9 @@
-#!/usr/bin/env python3
-import uvicorn
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastmcp import FastMCP
 
-# ── 1) Deine FastAPI-App ─────────────────────────────────────────
 app = FastAPI(title="Product API")
-_products: dict[int, dict] = {}  # simples In-Memory „DB“
+_products: dict[int, dict] = {}
 
 class Product(BaseModel):
     name: str
@@ -31,18 +28,7 @@ def create_product(p: Product):
     _products[new_id] = {"id": new_id, **p.model_dump()}
     return _products[new_id]
 
-# ── 2) Erzeuge den MCP-Server aus Deiner FastAPI-App ───────────────
-#    (ohne timeout, ohne stateless_http)
-mcp = FastMCP.from_fastapi(
-    app=app,
-    name="ProductMCP"
-)
+mcp = FastMCP.from_fastapi(app=app, name="ProductMCP")
 
-# ── 3) Starte den Streamable-HTTP-Server auf Port 3000 ─────────────
-#    Der MCP-Endpoint liegt dann unter http://127.0.0.1:3000/mcp
 if __name__ == "__main__":
-    mcp.run(
-        transport="streamable-http",
-        host="127.0.0.1",
-        port=3000
-    )
+    mcp.run(transport="streamable-http", host="127.0.0.1", port=3000)

@@ -1,2 +1,2 @@
 # Demo Root
-Dies ist Dein Demo-Stammverzeichnis.
+This is your demo root directory.

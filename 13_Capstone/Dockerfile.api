@@ -1,0 +1,23 @@
+# baut deinen api_server + llm_furniture_agent in einen Container
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# kopiere Quellcode und env
+COPY .env api_server.py llm_furniture_agent.py auth0_provider.py index.html .
+# Abhängigkeiten für FastAPI, Agent und MCP-Client
+RUN pip install --no-cache-dir \
+    fastapi \
+    "uvicorn[standard]" \
+    langchain-openai \
+    langchain-mcp-adapters \
+    langgraph \
+    mcp \
+    httpx \
+    python-dotenv
+
+EXPOSE 8000
+
+# startet deinen FastAPI-Server; 
+# erwarte, that in api_server.py ein FastAPI-Objekt namens "app" existiert
+CMD ["uvicorn", "api_server:app", "--host", "0.0.0.0", "--port", "8000"]

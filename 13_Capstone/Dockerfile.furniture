@@ -1,0 +1,17 @@
+# baut deinen furniture_server.py (+ auth0_provider.py) in einen Container
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# kopiere Quellcode und env
+COPY .env furniture_server.py auth0_provider.py .
+# Abhängigkeiten (fastmcp, jose, httpx, dotenv)
+RUN pip install --no-cache-dir \
+    fastmcp \
+    python-jose[cryptography] \
+    httpx \
+    python-dotenv
+
+EXPOSE 3000
+
+CMD ["python", "furniture_server.py"]

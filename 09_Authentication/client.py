@@ -1,0 +1,47 @@
+import asyncio
+import httpx
+
+from fastmcp import Client
+from fastmcp.client.transports import StreamableHttpTransport
+
+AUTH0_DOMAIN = "dev-ra0g3i6fh7x0s3ti.us.auth0.com"
+AUTH0_CLIENT_ID = "7En3BDIRwLL3QFs2FtyJ9R1uyW7ESFPq"
+AUTH0_CLIENT_SECRET = "ozZ1zFJaKtvzKMsjwNFNGykjiISCBCB122Qh-eVpKHwN4PzwWWTmQPpRnHDVMZvB"
+API_AUDIENCE = "http://localhost:3000/mcp"
+
+
+async def get_auth0_token() -> str:
+    """
+    Requests an access token from Auth0 using the Client Credentials Grant.
+    """
+    token_url = f"https://{AUTH0_DOMAIN}/oauth/token"
+    payload = {
+        "grant_type": "client_credentials",
+        "client_id": AUTH0_CLIENT_ID,
+        "client_secret": AUTH0_CLIENT_SECRET,
+        "audience": API_AUDIENCE,
+    }
+    async with httpx.AsyncClient() as http:
+        resp = await http.post(token_url, json=payload)
+        resp.raise_for_status()
+        data = resp.json()
+        return data["access_token"]
+
+
+async def main():
+    token = await get_auth0_token()
+    print("✅ Got Auth0 token:", token)
+
+    transport = StreamableHttpTransport(
+        url="http://127.0.0.1:3000/mcp",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    client = Client(transport)
+    async with client:
+        result = await client.call_tool("add", {"a": 5, "b": 7})
+        print("5 + 7 =", result[0].text)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

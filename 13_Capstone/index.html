@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Capstone Chat</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    html, body { height: 100%; margin: 0; padding: 0; }
+    body {
+      height: 100vh;
+      width: 100vw;
+      min-height: 100vh;
+      background: #e9ecef;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Roboto', Arial, sans-serif;
+    }
+    .chat-container {
+      background: linear-gradient(135deg, #f5fafd 70%, #dbeafe 100%);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.16);
+      border-radius: 20px;
+      width: 98vw;
+      max-width: 440px;
+      height: 92vh;
+      max-height: 720px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+    .chat-header {
+      flex: 0 0 56px;
+      background: #1880ff;
+      color: #fff;
+      font-weight: 500;
+      font-size: 1.2rem;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      letter-spacing: 0.04em;
+      box-shadow: 0 2px 4px rgba(24,128,255,0.04);
+      z-index: 1;
+    }
+    .chat-header .material-icons {
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 1.4rem;
+      color: #e3f0fb;
+      transition: color 0.2s;
+    }
+    .chat-header .material-icons:hover {
+      color: #ffe082;
+    }
+    /* Colorful separator line */
+    .header-line {
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, #ffab91 0%, #1880ff 48%, #b2ff59 100%);
+    }
+    .messages-area {
+      flex: 1 1 auto;
+      background: transparent;
+      padding: 24px 14px 14px 14px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7em;
+      scroll-behavior: smooth;
+      transition: background 0.25s;
+    }
+    .bubble-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 7px;
+      animation: flyIn 0.28s cubic-bezier(.54,1.7,.41,.92);
+    }
+    .bubble-row.user { flex-direction: row-reverse; }
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #f3f5fa;
+      color: #aaa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.26rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      user-select: none;
+    }
+    .avatar.ai {
+      background: linear-gradient(135deg, #1880ff 60%, #fff 100%);
+      color: #fff;
+    }
+    .avatar.user {
+      background: linear-gradient(135deg, #d2f8cd 80%, #a7eec0 100%);
+      color: #245724;
+    }
+    .bubble {
+      max-width: 80%;
+      padding: 0.75em 1.1em;
+      font-size: 1.05rem;
+      border-radius: 16px;
+      margin-bottom: 1px;
+      word-break: break-word;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: background 0.22s;
+      position: relative;
+      opacity: 0.98;
+    }
+    .bubble.ai {
+      background: #fff;
+      color: #1d3557;
+      border-bottom-left-radius: 5px;
+    }
+    .bubble.user {
+      background: #d2f8cd;
+      color: #245724;
+      border-bottom-right-radius: 5px;
+    }
+    .bubble.system {
+      background: #f1f2f3;
+      color: #1880ff;
+      align-self: center;
+      font-size: 0.99rem;
+      box-shadow: none;
+      border-radius: 18px;
+    }
+    @keyframes flyIn {
+      0% { opacity:0; transform: translateY(30px) scale(0.96); }
+      100% { opacity:0.98; transform: none; }
+    }
+    /* Animated typing indicator */
+    .typing {
+      display: flex;
+      gap: 2.5px;
+      align-items: center;
+      padding: 0.7em 1.3em;
+      background: #fff;
+      border-radius: 16px;
+      min-width: 38px;
+      max-width: 50px;
+      box-shadow: 0 1px 3px rgba(24,128,255,0.11);
+      margin-bottom: 1px;
+    }
+    .typing span {
+      width: 7px;
+      height: 7px;
+      background: #1880ff;
+      border-radius: 50%;
+      display: inline-block;
+      opacity: 0.38;
+      animation: blink 1.4s infinite both;
+    }
+    .typing span:nth-child(2) { animation-delay: .23s; }
+    .typing span:nth-child(3) { animation-delay: .43s; }
+    @keyframes blink {
+      0%,80%,100% { opacity: .38; }
+      40% { opacity: 1; }
+    }
+    /* Fixed input bar */
+    .input-bar {
+      flex: 0 0 68px;
+      background: #fafdff;
+      border-top: 1px solid #e0e8ef;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px 10px 10px;
+      box-shadow: 0 -2px 8px rgba(24,128,255,0.06);
+    }
+    .input-bar input[type="text"] {
+      flex: 1;
+      font-size: 1.09rem;
+      border-radius: 22px;
+      border: 1.5px solid #e4e8ef;
+      padding: 0.83em 1.1em;
+      outline: none;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      transition: border 0.17s, box-shadow 0.19s;
+    }
+    .input-bar input[type="text"]:focus {
+      border: 1.5px solid #1880ff;
+      box-shadow: 0 2px 7px #1880ff21;
+    }
+    .send-btn {
+      width: 44px;
+      height: 44px;
+      background: #1880ff;
+      color: #fff;
+      border-radius: 50%;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.48rem;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(24,128,255,0.13);
+      transition: box-shadow 0.19s, background 0.18s;
+      outline: none;
+      margin-right: 2px;
+    }
+    .send-btn:disabled {
+      background: #b8c9dd;
+      color: #f4f7fb;
+      cursor: default;
+      box-shadow: none;
+      display: none;
+    }
+    .send-btn:not(:disabled):hover,
+    .send-btn:focus:not(:disabled) {
+      box-shadow: 0 7px 19px 0 #2b8bff3a;
+      background: #1361c8;
+    }
+    /* Custom scrollbar */
+    .messages-area::-webkit-scrollbar {
+      width: 7px;
+      background: #e3eaf1;
+      border-radius: 8px;
+    }
+    .messages-area::-webkit-scrollbar-thumb {
+      background: #bddcff;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">
+      Capstone Chat
+      <i id="reset-btn" class="material-icons" title="Reset conversation">autorenew</i>
+    </div>
+    <div class="header-line"></div>
+    <div class="messages-area" id="chat-messages"></div>
+    <form class="input-bar" id="chat-form" autocomplete="off" onsubmit="return false;">
+      <input
+        id="msg-input"
+        type="text"
+        placeholder="Message…"
+        autocomplete="off"
+        maxlength="1000"
+      />
+      <button id="send-btn" class="send-btn" type="submit" disabled>
+        <span class="material-icons">send</span>
+      </button>
+    </form>
+  </div>
+  <script>
+    const STORAGE_KEY = 'chatHistory';
+    const messagesArea = document.getElementById('chat-messages');
+    const input = document.getElementById('msg-input');
+    const sendBtn = document.getElementById('send-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const chatForm = document.getElementById('chat-form');
+
+    // Load messages from localStorage
+    let messages = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+    if (messages.length === 0) {
+      showWelcome();
+    } else {
+      messages.forEach(m => appendMessage(m.role, m.content, false));
+    }
+    scrollToBottom();
+
+    // Reset conversation
+    resetBtn.addEventListener('click', () => {
+      if (confirm('Really clear chat history?')) {
+        localStorage.removeItem(STORAGE_KEY);
+        messages = [];
+        messagesArea.innerHTML = '';
+        showWelcome();
+      }
+    });
+
+    // Enable/disable send button
+    input.addEventListener('input', () => {
+      sendBtn.disabled = input.value.trim() === '';
+    });
+
+    // Submit on Enter
+    chatForm.addEventListener('submit', () => {
+      if (sendBtn.disabled) return;
+      const text = input.value.trim();
+      input.value = '';
+      sendBtn.disabled = true;
+      sendMessage(text);
+    });
+
+    function appendMessage(role, text, save = true) {
+      const row = document.createElement('div');
+      row.classList.add('bubble-row');
+      if (role === 'human') {
+        row.classList.add('user');
+        row.innerHTML = `
+          <div class="avatar user" title="You">👤</div>
+          <div class="bubble user">${escapeHTML(text)}</div>
+        `;
+      } else if (role === 'ai') {
+        row.classList.add('ai');
+        row.innerHTML = `
+          <div class="avatar ai" title="AI">🤖</div>
+          <div class="bubble ai">${escapeHTML(text)}</div>
+        `;
+      } else { // system
+        const sys = document.createElement('div');
+        sys.className = "bubble system";
+        sys.textContent = text;
+        row.appendChild(sys);
+      }
+      messagesArea.appendChild(row);
+      if (save) {
+        messages.push({ role, content: text });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+      }
+      scrollToBottom();
+    }
+
+    function showWelcome() {
+      appendMessage('system', "👋 Welcome to Capstone! How can I help?", false);
+    }
+
+    function scrollToBottom() {
+      messagesArea.scrollTop = messagesArea.scrollHeight;
+    }
+
+    function appendLoadingBubble() {
+      const row = document.createElement('div');
+      row.className = 'bubble-row ai';
+      row.innerHTML = `
+        <div class="avatar ai" title="AI">🤖</div>
+        <div class="typing"><span></span><span></span><span></span></div>
+      `;
+      messagesArea.appendChild(row);
+      scrollToBottom();
+      return row;
+    }
+
+    async function sendMessage(userText) {
+      appendMessage('human', userText);
+      const loadingRow = appendLoadingBubble();
+      try {
+        const res = await fetch('/ask', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages })
+        });
+        if (!res.ok) throw new Error(`Status ${res.status}`);
+        const { answer } = await res.json();
+        messagesArea.removeChild(loadingRow);
+        appendMessage('ai', answer);
+      } catch (err) {
+        if (loadingRow.parentNode) messagesArea.removeChild(loadingRow);
+        appendMessage('ai', `Error: ${err.message}`);
+      }
+    }
+
+    // Simple escape to prevent HTML injection in this demo
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, c => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'
+      }[c]));
+    }
+  </script>
+</body>
+</html>

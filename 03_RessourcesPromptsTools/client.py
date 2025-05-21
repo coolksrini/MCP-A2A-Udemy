@@ -4,6 +4,7 @@ from mcp.client.streamable_http import streamablehttp_client
 
 SERVER = "http://127.0.0.1:8000/mcp"
 
+
 async def main() -> None:
     async with streamablehttp_client(SERVER) as (read, write, get_sid):
         async with ClientSession(read, write) as session:
@@ -36,6 +37,7 @@ async def main() -> None:
             print("\nPrompt messages:")
             for message in prompt_response.messages:
                 print(f"[{message.role}] {message.content.text}")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

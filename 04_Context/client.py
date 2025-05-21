@@ -4,12 +4,12 @@ from fastmcp.client.transports import StreamableHttpTransport
 from fastmcp.client.logging import LogMessage
 import mcp.types as types
 
+
 async def message_handler(msg):
     if not isinstance(msg, types.ServerNotification):
         return
 
     root = msg.root
-    # wenn es eine Progress-Notification ist, p auslesen
     if isinstance(root, types.ProgressNotification):
         p = root.params
         print(f"[Progress] {p.progress}/{p.total or '?'}")
@@ -19,23 +19,21 @@ async def log_handler(params: LogMessage):
     level = params.level.upper()
     print(f"[Log – {level}] {params.data}")
 
+
 async def main():
     transport = StreamableHttpTransport(url="http://127.0.0.1:8000/mcp")
-    client = Client(
-        transport,
-        message_handler=message_handler,
-        log_handler=log_handler
-    )
+    client = Client(transport, message_handler=message_handler, log_handler=log_handler)
 
     async with client:
         tools = await client.list_tools()
         print("→ Available tools:", [t.name for t in tools])
 
         print("→ Calling process_items…")
-        items = ["eins", "zwei", "drei", "vier", "fünf"]
+        items = ["one", "two", "three", "four", "five"]
         result = await client.call_tool("process_items", {"items": items})
         processed = [c.text for c in result]
         print("→ Result:", processed)
+
 
 if __name__ == "__main__":
     asyncio.run(main())

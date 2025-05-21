@@ -1,65 +1,45 @@
 #!/usr/bin/env python3
-import asyncio
-from dotenv import load_dotenv
+import os
+from fastmcp import FastMCP, Context
+from urllib.parse import urlparse, unquote
 
-load_dotenv()
+mcp = FastMCP(name="FileSearchServer")
 
-from fastmcp import Client
-from fastmcp.client.transports import StreamableHttpTransport
-from fastmcp.client.sampling import SamplingMessage, SamplingParams, RequestContext
 
-from langchain_openai import ChatOpenAI
-from langchain_core.messages import HumanMessage, SystemMessage
+@mcp.tool(
+    name="find_file", description="Search for a file in the provided root directories"
+)
+async def find_file(filename: str, ctx: Context) -> list[str]:
+    """
+    Recursively searches all file:// roots for 'filename' and
+    returns all found absolute paths.
+    """
+    roots = await ctx.list_roots()
+    matches: list[str] = []
 
-async def sampling_handler(
-    messages: list[SamplingMessage],
-    params: SamplingParams,
-    context: RequestContext
-) -> str:
-    print("[Client] sampling_handler invoked")
-    print(f"[Client] Received {len(messages)} message(s), params: {params}")
+    for root in roots:
+        uri_str = str(root.uri)
+        parsed = urlparse(uri_str)
 
-    lc_msgs = []
-    # Include system prompt if provided
-    if params.systemPrompt:
-        print("[Client] Using system_prompt:", params.systemPrompt)
-        lc_msgs.append(SystemMessage(content=params.systemPrompt))
+        if parsed.scheme != "file":
+            continue
 
-    # Append each user message
-    for idx, msg in enumerate(messages, start=1):
-        print(f"[Client] Message #{idx} content:", msg.content.text)
-        lc_msgs.append(HumanMessage(content=msg.content.text))
+        path = unquote(parsed.path)
 
-    # Create the LLM with the provided sampling parameters
-    llm = ChatOpenAI(
-        model="gpt-4o-mini",
-        temperature=params.temperature or 0.0,
-        max_tokens=params.maxTokens or 64
-    )
+        if (
+            os.name == "nt"
+            and path.startswith("/")
+            and len(path) > 2
+            and path[2] == ":"
+        ):
+            path = path[1:]
 
-    # IMPORTANT: pass messages via the `input` keyword, not as a dict
-    result = await llm.ainvoke(input=lc_msgs)
-    return result.content
+        for dirpath, _, files in os.walk(path):
+            if filename in files:
+                matches.append(os.path.join(dirpath, filename))
 
-async def main():
-    transport = StreamableHttpTransport(url="http://127.0.0.1:3000/mcp")
-    client = Client(
-        transport,
-        sampling_handler=sampling_handler
-    )
+    return matches
 
-    # Example function code for which we want a docstring
-    code_snippet = """\
-def add(a: int, b: int) -> int:
-    return a + b
-"""
-
-    async with client:
-        result = await client.call_tool(
-            "generate_docstring",
-            {"code": code_snippet}
-        )
-        print("Generated Docstring:\n", result[0].text)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    mcp.run(transport="streamable-http")
