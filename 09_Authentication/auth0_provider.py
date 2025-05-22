@@ -4,7 +4,6 @@ from mcp.server.auth.provider import OAuthAuthorizationServerProvider
 from mcp.shared.auth import OAuthClientInformationFull
 from mcp.server.auth.provider import AccessToken, AuthorizationCode, RefreshToken
 
-
 class Auth0Provider(
     OAuthAuthorizationServerProvider[AuthorizationCode, RefreshToken, AccessToken]
 ):
@@ -25,9 +24,9 @@ class Auth0Provider(
 
     async def load_access_token(self, token: str) -> AccessToken | None:
         if self._jwks is None:
-            resp = httpx.get(self.jwks_url)
-            resp.raise_for_status()
-            self._jwks = resp.json()["keys"]
+            response = httpx.get(self.jwks_url)
+            response.raise_for_status()
+            self._jwks = response.json()["keys"]
 
         header = jose_jwt.get_unverified_header(token)
         key = next(k for k in self._jwks if k["kid"] == header["kid"])

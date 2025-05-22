@@ -1,131 +1,122 @@
-# furniture_server.py
 import datetime
 from fastmcp import FastMCP
 from mcp.server.auth.settings import AuthSettings
 from auth0_provider import Auth0Provider
 
-# --- Auth0 Konfiguration (bleibt gleich) ---
 AUTH0_DOMAIN = "dev-ra0g3i6fh7x0s3ti.us.auth0.com"
 API_AUDIENCE = "http://localhost:3000/mcp"
 REQUIRED_SCOPES = ["read:furniture"]
 
-# --- Fiktive Möbel-Datenbank ---
-# Struktur: { "produkt_id": {"name": "Produktname", "preis": 123.45, "kategorie": "...", "beschreibung": "..."} }
 furniture_db = {
     "chair_001": {
-        "name": "Klassischer Holzstuhl",
+        "name": "Classic Wood Chair",
         "price": 49.99,
-        "category": "Stühle",
-        "description": "Ein robuster Stuhl aus Eichenholz.",
+        "category": "Chairs",
+        "description": "A sturdy oak chair.",
     },
     "table_001": {
-        "name": "Esstisch 'Rustikal'",
+        "name": "Rustic Dining Table",
         "price": 199.50,
-        "category": "Tische",
-        "description": "Großer Esstisch für bis zu 6 Personen.",
+        "category": "Tables",
+        "description": "Large table for up to six people.",
     },
     "sofa_001": {
-        "name": "Bequemes Ecksofa",
+        "name": "Comfort Corner Sofa",
         "price": 499.00,
         "category": "Sofas",
-        "description": "Modernes Ecksofa mit Stoffbezug.",
+        "description": "Modern fabric corner sofa.",
     },
     "shelf_001": {
-        "name": "Bücherregal 'Bibliothek'",
+        "name": "Library Bookshelf",
         "price": 89.90,
-        "category": "Regale",
-        "description": "Hohes Regal mit viel Stauraum.",
+        "category": "Shelves",
+        "description": "Tall shelf with ample storage.",
     },
     "lamp_001": {
-        "name": "Designer Stehlampe",
+        "name": "Designer Floor Lamp",
         "price": 75.00,
-        "category": "Beleuchtung",
-        "description": "Elegante Stehlampe für gemütliches Licht.",
+        "category": "Lighting",
+        "description": "Elegant lamp for cozy lighting.",
     },
     "desk_001": {
-        "name": "Schreibtisch 'Minimalist'",
+        "name": "Minimalist Desk",
         "price": 120.00,
-        "category": "Tische",
-        "description": "Schlichter Schreibtisch mit Schublade.",
+        "category": "Tables",
+        "description": "Sleek desk with a drawer.",
     },
 }
 
-# --- FastMCP Server Setup ---
-auth0_mcp_provider = Auth0Provider(AUTH0_DOMAIN, API_AUDIENCE)
+auth0_provider = Auth0Provider(AUTH0_DOMAIN, API_AUDIENCE)
 auth_settings = AuthSettings(
-    issuer_url=f"https://{AUTH0_DOMAIN}/", required_scopes=REQUIRED_SCOPES
+    issuer_url=f"https://{AUTH0_DOMAIN}/",
+    required_scopes=REQUIRED_SCOPES
 )
 
 furniture_mcp = FastMCP(
     name="FurniturePriceInfoServer",
     stateless_http=True,
-    auth_server_provider=auth0_mcp_provider,
+    auth_server_provider=auth0_provider,
     auth=auth_settings,
 )
 
-
 @furniture_mcp.tool(
-    description="Lists all available furniture items with their names and prices."
+    description="Provide a list of all furniture items along with their prices."
 )
 def list_all_furniture() -> str:
     """
-    Gibt eine Liste aller Möbelstücke mit Namen und Preisen zurück.
+    Compiles a summary of every furniture item and its price.
     """
-    print("[FurnitureServer] list_all_furniture called.")
+    print("[FurniturePriceInfoServer] Running list_all_furniture.")
     if not furniture_db:
-        return "Currently, no furniture items are listed."
+        return "No furniture items are currently available."
 
-    response_parts = ["Here are the available furniture items and their prices:"]
-    for item_id, details in furniture_db.items():
-        response_parts.append(
-            f"- {details['name']}: ${details['price']:.2f} (ID: {item_id})"
-        )
-
-    return "\n".join(response_parts)
-
+    output = ["Available furniture and their prices:"]
+    for item_id, item in furniture_db.items():
+        output.append(f"- {item['name']}: ${item['price']:.2f} (ID: {item_id})")
+    return "\n".join(output)
 
 @furniture_mcp.tool(
-    description="Gets the price and details for a specific furniture item by its name or ID. If searching by name, it will try to find the best match."
+    description="Retrieve details and price for a specific furniture item by ID or name."
 )
 def get_furniture_price(identifier: str) -> str:
     """
-    Ruft Preis und Details für ein bestimmtes Möbelstück anhand des Namens oder der ID ab.
+    Looks up and returns price and description for the specified furniture item.
     """
-    print(f"[FurnitureServer] get_furniture_price called with identifier: {identifier}")
-
-    # Zuerst prüfen, ob der Identifier eine bekannte ID ist
+    print(f"[FurniturePriceInfoServer] Running get_furniture_price for '{identifier}'.")
     if identifier in furniture_db:
-        details = furniture_db[identifier]
-        return f"The price for '{details['name']}' (ID: {identifier}) is ${details['price']:.2f}. Description: {details.get('description', 'N/A')}"
+        item = furniture_db[identifier]
+        return (
+            f"'{item['name']}' (ID: {identifier}) costs ${item['price']:.2f}. "
+            f"Details: {item.get('description', 'No description available')}."
+        )
 
-    # Wenn keine ID, versuche eine Namenssuche (einfache Teilstring-Suche, case-insensitive)
-    identifier_lower = identifier.lower()
-    found_items = []
-    for item_id, details in furniture_db.items():
-        if identifier_lower in details["name"].lower():
-            found_items.append({"id": item_id, "details": details})
+    key = identifier.lower()
+    matches = [
+        (item_id, info)
+        for item_id, info in furniture_db.items()
+        if key in info["name"].lower()
+    ]
 
-    if not found_items:
-        return f"Sorry, I could not find any furniture item matching '{identifier}'."
+    if not matches:
+        return f"Could not find any furniture matching '{identifier}'."
 
-    if len(found_items) == 1:
-        item = found_items[0]
-        return f"The price for '{item['details']['name']}' (ID: {item['id']}) is ${item['details']['price']:.2f}. Description: {item['details'].get('description', 'N/A')}"
-    else:
-        # Mehrere Treffer, gib eine Auswahl zurück
-        response_parts = [
-            f"I found multiple items matching '{identifier}'. Please be more specific or use the ID:"
-        ]
-        for item in found_items:
-            response_parts.append(
-                f"- {item['details']['name']}: ${item['details']['price']:.2f} (ID: {item['id']})"
-            )
-        return "\n".join(response_parts)
+    if len(matches) == 1:
+        item_id, item = matches[0]
+        return (
+            f"'{item['name']}' (ID: {item_id}) costs ${item['price']:.2f}. "
+            f"Details: {item.get('description', 'No description available')}."
+        )
 
+    output = [f"Multiple items match '{identifier}'. Please specify an ID:"]
+    for item_id, item in matches:
+        output.append(f"- {item['name']}: ${item['price']:.2f} (ID: {item_id})")
+    return "\n".join(output)
 
 if __name__ == "__main__":
     print(
-        f"Starting Furniture Price Info Server ({furniture_mcp.name}) on http://127.0.0.1:3000/mcp"
+        f"Starting {furniture_mcp.name} at http://0.0.0.0:3000/mcp"
     )
-    print(f"This server requires an Auth0 token with the scope(s): {REQUIRED_SCOPES}")
+    print(
+        f"Required Auth0 scope(s): {REQUIRED_SCOPES}"
+    )
     furniture_mcp.run(transport="streamable-http", host="0.0.0.0", port=3000)

@@ -434,6 +434,19 @@ wheels = [
 ]
 
 [[package]]
+name = "langchain-mcp-adapters"
+version = "0.1.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "langchain-core" },
+    { name = "mcp" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b0/de/62a6ee2c21f74eed961773e75a4e3170f8abc79fd5fd7a1b4e2ea07f4c04/langchain_mcp_adapters-0.1.1.tar.gz", hash = "sha256:e43ddf06e4ce237ad80f5c91d0efa7fd7c845b274a5a07e7e8a7f9d7239331d7", size = 17359, upload-time = "2025-05-20T14:20:35.025Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/30/68/13405f252b38a8e1bd7ef345907a4e0eda535c2ca36fe4d6821fc7e9f5de/langchain_mcp_adapters-0.1.1-py3-none-any.whl", hash = "sha256:81594b265d824012040ebd24056fbdb5aabf0b46f780e369ed132421e3411e4d", size = 12100, upload-time = "2025-05-20T14:20:34.236Z" },
+]
+
+[[package]]
 name = "langchain-openai"
 version = "0.3.17"
 source = { registry = "https://pypi.org/simple" }
@@ -573,6 +586,7 @@ dependencies = [
     { name = "fastapi" },
     { name = "fastmcp" },
     { name = "langchain" },
+    { name = "langchain-mcp-adapters" },
     { name = "langchain-openai" },
     { name = "langgraph" },
     { name = "python-jose" },
@@ -585,6 +599,7 @@ requires-dist = [
     { name = "fastapi", specifier = ">=0.115.12" },
     { name = "fastmcp", specifier = ">=2.3.5" },
     { name = "langchain", specifier = ">=0.3.25" },
+    { name = "langchain-mcp-adapters", specifier = ">=0.1.1" },
     { name = "langchain-openai", specifier = ">=0.3.17" },
     { name = "langgraph", specifier = ">=0.4.5" },
     { name = "python-jose", specifier = ">=3.4.0" },

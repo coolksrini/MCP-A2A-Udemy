@@ -12,7 +12,7 @@ API_AUDIENCE = "http://localhost:3000/mcp"
 
 async def get_auth0_token() -> str:
     """
-    Requests an access token from Auth0 using the Client Credentials Grant.
+    Request an access token from Auth0 using the Client Credentials Grant.
     """
     token_url = f"https://{AUTH0_DOMAIN}/oauth/token"
     payload = {
@@ -22,15 +22,15 @@ async def get_auth0_token() -> str:
         "audience": API_AUDIENCE,
     }
     async with httpx.AsyncClient() as http:
-        resp = await http.post(token_url, json=payload)
-        resp.raise_for_status()
-        data = resp.json()
+        response = await http.post(token_url, json=payload)
+        response.raise_for_status()
+        data = response.json()
         return data["access_token"]
 
 
 async def main():
     token = await get_auth0_token()
-    print("✅ Got Auth0 token:", token)
+    print("Got Auth0 token:", token)
 
     transport = StreamableHttpTransport(
         url="http://127.0.0.1:3000/mcp",

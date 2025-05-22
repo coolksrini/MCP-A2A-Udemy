@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import asyncio
 from dotenv import load_dotenv
 
@@ -9,12 +8,9 @@ from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.prebuilt import create_react_agent
 from langchain_core.messages import AIMessage
 
-
 async def main():
-    # 1) LLM-Instanz
     llm = ChatOpenAI(model="gpt-4o-mini")
 
-    # 2) MultiServerMCPClient konfigurieren
     client = MultiServerMCPClient(
         {
             "weather": {
@@ -31,14 +27,13 @@ async def main():
 
     result = await agent.ainvoke({"messages": question})
 
-    msgs = result["messages"]
-    for m in reversed(msgs):
-        if isinstance(m, AIMessage):
-            print("Agent-Antwort:", m.content)
+    messages = result["messages"]
+    for msg in reversed(messages):
+        if isinstance(msg, AIMessage):
+            print("Agent response:", msg.content)
             break
     else:
-        print("Keine AIMessage gefunden.")
-
+        print("No AIMessage found.")
 
 if __name__ == "__main__":
     asyncio.run(main())

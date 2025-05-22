@@ -1,4 +1,5 @@
 version: "3.8"
+
 services:
   furniture_server:
     build:
@@ -8,6 +9,8 @@ services:
       - .env
     ports:
       - "3000:3000"
+    networks:
+      - app-network
 
   api_server:
     build:
@@ -17,7 +20,8 @@ services:
       - .env
     depends_on:
       - furniture_server
-    # wir brauchen hier kein ports-Mapping auf 8000, weil Nginx ihn reached
+    networks:
+      - app-network
 
   frontend:
     build:
@@ -27,3 +31,9 @@ services:
       - "8080:80"
     depends_on:
       - api_server
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

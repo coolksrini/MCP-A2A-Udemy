@@ -1,9 +1,7 @@
 FROM nginx:alpine
 
-# Kopiere dein index.html ins nginx-Servver-Verzeichnis
 COPY index.html /usr/share/nginx/html/index.html
 
-# Unsere eigene nginx-Konfiguration (ersetzt default)
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80

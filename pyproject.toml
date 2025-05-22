@@ -8,6 +8,7 @@ dependencies = [
     "fastapi>=0.115.12",
     "fastmcp>=2.3.5",
     "langchain>=0.3.25",
+    "langchain-mcp-adapters>=0.1.1",
     "langchain-openai>=0.3.17",
     "langgraph>=0.4.5",
     "python-jose>=3.4.0",
