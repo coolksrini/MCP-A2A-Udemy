@@ -1,4 +1,3 @@
-import datetime
 from fastmcp import FastMCP
 from mcp.server.auth.settings import AuthSettings
 from auth0_provider import Auth0Provider

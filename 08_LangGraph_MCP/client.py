@@ -1,16 +1,15 @@
 import asyncio
 from dotenv import load_dotenv
 
-load_dotenv()
 
-from langchain_openai import ChatOpenAI
+
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.prebuilt import create_react_agent
 from langchain_core.messages import AIMessage
 
-async def main():
-    llm = ChatOpenAI(model="gpt-4o-mini")
+load_dotenv()
 
+async def main():
     client = MultiServerMCPClient(
         {
             "weather": {

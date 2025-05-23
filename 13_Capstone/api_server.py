@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel, Field
-from typing import List, Literal, Union
+from typing import List, Literal
 from contextlib import asynccontextmanager
 import uvicorn
 

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from fastmcp import FastMCP, Context
 
 mcp = FastMCP(name="DocGenServer")
@@ -20,7 +19,6 @@ async def generate_docstring(code: str, ctx: Context) -> str:
     )
     print("[Server] Sampling prompt constructed:\n", prompt)
 
-    # Send a sampling/createMessage request to the client
     response = await ctx.sample(
         messages=prompt,
         system_prompt="You are a Python documentation assistant.",

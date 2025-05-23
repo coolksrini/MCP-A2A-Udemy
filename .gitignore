@@ -2,3 +2,4 @@ JSON_RCP.md
 .venv
 .env
 docs.md
+.ruff_cache

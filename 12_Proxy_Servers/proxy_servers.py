@@ -1,6 +1,6 @@
 import asyncio
 from fastmcp import FastMCP, Client
-from fastmcp.client.transports import SSETransport, StreamableHttpTransport
+from fastmcp.client.transports import SSETransport
 
 LEGACY_SSE_BACKEND_URL = "http://127.0.0.1:9001/sse"
 

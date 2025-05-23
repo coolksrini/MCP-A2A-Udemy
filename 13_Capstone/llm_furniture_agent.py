@@ -1,17 +1,18 @@
-import asyncio
 import os
 import httpx
 from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 
-load_dotenv()
 
 from langchain_openai import ChatOpenAI
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.prebuilt import create_react_agent
-from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
+from langchain_core.messages import AIMessage, BaseMessage
 from typing import List
 from mcp import McpError
+
+load_dotenv()
+
 
 class FurnitureAgent:
     def __init__(self):
