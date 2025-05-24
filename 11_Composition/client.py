@@ -4,15 +4,20 @@ import httpx
 from fastmcp import Client
 from fastmcp.client.transports import StreamableHttpTransport
 from mcp import McpError
+import os
 
-AUTH0_DOMAIN = "dev-ra0g3i6fh7x0s3ti.us.auth0.com"
-API_AUDIENCE = "http://localhost:3000/mcp"
+AUTH0_DOMAIN = os.environ["AUTH0_DOMAIN"]
+API_AUDIENCE = os.environ["API_AUDIENCE", "http://localhost:3000/mcp"] 
+AUTH0_DOMAIN          = os.environ["AUTH0_DOMAIN"]
+API_AUDIENCE          = os.environ["API_AUDIENCE"]
+ADMIN_CLIENT_ID       = os.environ["AUTH0_CLIENT_ID"]
+ADMIN_CLIENT_SECRET   = os.environ["AUTH0_CLIENT_SECRET"]
+PRAKTIKANT_CLIENT_ID  = os.environ["PRAKTIKANT_CLIENT_ID"]
+PRAKTIKANT_CLIENT_SECRET = os.environ["PRAKTIKANT_CLIENT_SECRET"]
 
-ADMIN_CLIENT_ID = "7En3BDIRwLL3QFs2FtyJ9R1uyW7ESFPq"
-ADMIN_CLIENT_SECRET = "ozZ1zFJaKtvzKMsjwNFNGykjiISCBCB122Qh-eVpKHwN4PzwWWTmQPpRnHDVMZvB"
 
-PRAKTIKANT_CLIENT_ID = "DnqGPEVTOqpv5SD89ubDIAycCY8FuoJ2"
-PRAKTIKANT_CLIENT_SECRET = "3S87FstudnXLdngJOR9D19gtZPzBSkyvAqqqp21ZLB7cagH6uQNavI76mEK9DkHw"
+
+
 
 
 async def get_auth0_token(client_name: str, client_id: str, client_secret: str) -> str | None:

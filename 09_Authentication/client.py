@@ -1,13 +1,13 @@
 import asyncio
 import httpx
-
+import os
 from fastmcp import Client
 from fastmcp.client.transports import StreamableHttpTransport
 
-AUTH0_DOMAIN = "dev-ra0g3i6fh7x0s3ti.us.auth0.com"
-AUTH0_CLIENT_ID = "7En3BDIRwLL3QFs2FtyJ9R1uyW7ESFPq"
-AUTH0_CLIENT_SECRET = "ozZ1zFJaKtvzKMsjwNFNGykjiISCBCB122Qh-eVpKHwN4PzwWWTmQPpRnHDVMZvB"
-API_AUDIENCE = "http://localhost:3000/mcp"
+AUTH0_DOMAIN = os.environ["AUTH0_DOMAIN"]
+AUTH0_CLIENT_ID = os.environ["AUTH0_CLIENT_ID"]
+AUTH0_CLIENT_SECRET = os.environ["AUTH0_CLIENT_SECRET"]
+API_AUDIENCE = os.environ["API_AUDIENCE", "http://localhost:3000/mcp"]
 
 
 async def get_auth0_token() -> str:

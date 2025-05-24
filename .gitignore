@@ -3,3 +3,5 @@ JSON_RCP.md
 .env
 docs.md
 .ruff_cache
+__pycache__
+order.md
