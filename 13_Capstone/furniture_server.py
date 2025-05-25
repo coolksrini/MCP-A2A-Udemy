@@ -1,7 +1,8 @@
+import os
+
+from auth0_provider import Auth0Provider
 from fastmcp import FastMCP
 from mcp.server.auth.settings import AuthSettings
-from auth0_provider import Auth0Provider
-import os
 
 AUTH0_DOMAIN = os.environ["AUTH0_DOMAIN"]
 API_AUDIENCE = os.environ["API_AUDIENCE"]
@@ -48,8 +49,7 @@ furniture_db = {
 
 auth0_provider = Auth0Provider(AUTH0_DOMAIN, API_AUDIENCE)
 auth_settings = AuthSettings(
-    issuer_url=f"https://{AUTH0_DOMAIN}/",
-    required_scopes=REQUIRED_SCOPES
+    issuer_url=f"https://{AUTH0_DOMAIN}/", required_scopes=REQUIRED_SCOPES
 )
 
 furniture_mcp = FastMCP(
@@ -58,6 +58,7 @@ furniture_mcp = FastMCP(
     auth_server_provider=auth0_provider,
     auth=auth_settings,
 )
+
 
 @furniture_mcp.tool(
     description="Provide a list of all furniture items along with their prices."
@@ -74,6 +75,7 @@ def list_all_furniture() -> str:
     for item_id, item in furniture_db.items():
         output.append(f"- {item['name']}: ${item['price']:.2f} (ID: {item_id})")
     return "\n".join(output)
+
 
 @furniture_mcp.tool(
     description="Retrieve details and price for a specific furniture item by ID or name."
@@ -112,11 +114,8 @@ def get_furniture_price(identifier: str) -> str:
         output.append(f"- {item['name']}: ${item['price']:.2f} (ID: {item_id})")
     return "\n".join(output)
 
+
 if __name__ == "__main__":
-    print(
-        f"Starting {furniture_mcp.name} at http://0.0.0.0:3000/mcp"
-    )
-    print(
-        f"Required Auth0 scope(s): {REQUIRED_SCOPES}"
-    )
+    print(f"Starting {furniture_mcp.name} at http://0.0.0.0:3000/mcp")
+    print(f"Required Auth0 scope(s): {REQUIRED_SCOPES}")
     furniture_mcp.run(transport="streamable-http", host="0.0.0.0", port=3000)

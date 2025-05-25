@@ -1,8 +1,10 @@
 import asyncio
-from fastmcp import FastMCP, Client
+
+from fastmcp import Client, FastMCP
 from fastmcp.client.transports import SSETransport
 
 LEGACY_SSE_BACKEND_URL = "http://127.0.0.1:9001/sse"
+
 
 async def create_modern_proxy_instance() -> FastMCP | None:
     print(f"Creating modern proxy for legacy SSE backend at: {LEGACY_SSE_BACKEND_URL}")
@@ -20,13 +22,13 @@ async def create_modern_proxy_instance() -> FastMCP | None:
     try:
         print(f"Initializing proxy client for {LEGACY_SSE_BACKEND_URL}")
         modern_proxy_mcp = FastMCP.from_client(
-            legacy_backend_client,
-            name="ModernProxyToLegacy",
-            stateless_http=True
+            legacy_backend_client, name="ModernProxyToLegacy", stateless_http=True
         )
         tools_on_proxy = await modern_proxy_mcp.get_tools()
         if not tools_on_proxy:
-            print(f"WARNING: Proxy '{modern_proxy_mcp.name}' created but no tools were proxied.")
+            print(
+                f"WARNING: Proxy '{modern_proxy_mcp.name}' created but no tools were proxied."
+            )
         else:
             print(
                 f"Proxy '{modern_proxy_mcp.name}' created with tools: "
@@ -36,6 +38,7 @@ async def create_modern_proxy_instance() -> FastMCP | None:
     except Exception as e:
         print(f"ERROR creating proxy instance: {e}")
         return None
+
 
 def main():
     print("Starting modern proxy server (StreamableHTTP) using SSE backend")
@@ -47,13 +50,10 @@ def main():
             f"Starting proxy server '{proxy_mcp.name}' "
             f"at http://{proxy_host}:{proxy_port}/mcp"
         )
-        proxy_mcp.run(
-            transport="streamable-http",
-            host=proxy_host,
-            port=proxy_port
-        )
+        proxy_mcp.run(transport="streamable-http", host=proxy_host, port=proxy_port)
     else:
         print("Failed to start modern proxy server.")
+
 
 if __name__ == "__main__":
     try:

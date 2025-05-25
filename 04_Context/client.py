@@ -1,8 +1,9 @@
 import asyncio
-from fastmcp import Client
-from fastmcp.client.transports import StreamableHttpTransport
-from fastmcp.client.logging import LogMessage
+
 import mcp.types as types
+from fastmcp import Client
+from fastmcp.client.logging import LogMessage
+from fastmcp.client.transports import StreamableHttpTransport
 
 
 async def message_handler(msg):
@@ -21,7 +22,7 @@ async def log_handler(params: LogMessage):
 
 
 async def main():
-    transport = StreamableHttpTransport(url="http://127.0.0.1:8000/mcp")
+    transport = StreamableHttpTransport(url="http://127.0.0.1:8000/mcp/")
     client = Client(transport, message_handler=message_handler, log_handler=log_handler)
 
     async with client:

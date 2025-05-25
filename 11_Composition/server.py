@@ -1,7 +1,8 @@
+import os
+
+from auth0_provider import Auth0Provider
 from fastmcp import FastMCP
 from mcp.server.auth.settings import AuthSettings
-from auth0_provider import Auth0Provider
-import os
 
 AUTH0_DOMAIN = os.environ["AUTH0_DOMAIN"]
 API_AUDIENCE = os.environ["API_AUDIENCE", "http://localhost:3000/mcp"]
@@ -10,8 +11,7 @@ auth0_provider = Auth0Provider(AUTH0_DOMAIN, API_AUDIENCE)
 
 add_scopes = ["read:add"]
 add_auth_settings = AuthSettings(
-    issuer_url=f"https://{AUTH0_DOMAIN}/",
-    required_scopes=add_scopes
+    issuer_url=f"https://{AUTH0_DOMAIN}/", required_scopes=add_scopes
 )
 add_server = FastMCP(
     name="AddService",
@@ -20,15 +20,16 @@ add_server = FastMCP(
     auth=add_auth_settings,
 )
 
+
 @add_server.tool(description="Add two integers")
 def add(a: int, b: int) -> int:
     print(f"Executing add tool with a={a}, b={b}")
     return a + b
 
+
 delete_scopes = ["admin:delete"]
 delete_auth_settings = AuthSettings(
-    issuer_url=f"https://{AUTH0_DOMAIN}/",
-    required_scopes=delete_scopes
+    issuer_url=f"https://{AUTH0_DOMAIN}/", required_scopes=delete_scopes
 )
 delete_server = FastMCP(
     name="DeleteService",
@@ -37,10 +38,12 @@ delete_server = FastMCP(
     auth=delete_auth_settings,
 )
 
+
 @delete_server.tool(description="Simulate deleting an item")
 def delete_item(item_id: str) -> str:
     print(f"Executing delete_item tool for item_id={item_id}")
     return f"Item '{item_id}' was 'deleted' successfully."
+
 
 main_mcp = FastMCP(
     name="MainAppServer",

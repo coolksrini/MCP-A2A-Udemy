@@ -1,6 +1,5 @@
 import uvicorn
 from fastapi import FastAPI
-
 from server import mcp
 
 mcp_app = mcp.http_app(path="/mcp")

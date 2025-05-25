@@ -1,8 +1,10 @@
 import asyncio
+
 from mcp import ClientSession
 from mcp.client.streamable_http import streamablehttp_client
 
-SERVER = "http://127.0.0.1:3000/mcp"
+SERVER = "http://127.0.0.1:3000/mcp/"
+
 
 async def main() -> None:
     async with streamablehttp_client(SERVER) as (read, write, get_sid):
@@ -35,6 +37,7 @@ async def main() -> None:
 
             updated_products = await session.read_resource(list_uri)
             print("Updated products:", updated_products.contents[0].text)
+
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -1,7 +1,8 @@
 import asyncio
 import sys
+
 from mcp import ClientSession
-from mcp.client.stdio import stdio_client, StdioServerParameters
+from mcp.client.stdio import StdioServerParameters, stdio_client
 
 
 async def main() -> None:

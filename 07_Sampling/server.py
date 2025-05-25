@@ -1,4 +1,4 @@
-from fastmcp import FastMCP, Context
+from fastmcp import Context, FastMCP
 
 mcp = FastMCP(name="DocGenServer")
 

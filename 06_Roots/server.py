@@ -1,6 +1,7 @@
 import os
-from fastmcp import FastMCP, Context
-from urllib.parse import urlparse, unquote
+from urllib.parse import unquote, urlparse
+
+from fastmcp import Context, FastMCP
 
 mcp = FastMCP(name="FileSearchServer")
 

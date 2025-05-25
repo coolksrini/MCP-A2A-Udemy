@@ -1,6 +1,7 @@
 import asyncio
-import httpx
 import os
+
+import httpx
 from fastmcp import Client
 from fastmcp.client.transports import StreamableHttpTransport
 
@@ -33,8 +34,7 @@ async def main():
     print("Got Auth0 token:", token)
 
     transport = StreamableHttpTransport(
-        url="http://127.0.0.1:3000/mcp",
-        headers={"Authorization": f"Bearer {token}"}
+        url="http://127.0.0.1:3000/mcp/", headers={"Authorization": f"Bearer {token}"}
     )
 
     client = Client(transport)

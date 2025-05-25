@@ -1,10 +1,11 @@
 import asyncio
+
 from mcp import ClientSession
 from mcp.client.streamable_http import streamablehttp_client
 
 
 async def main():
-    url = "http://127.0.0.1:8000/mcp"
+    url = "http://127.0.0.1:8000/mcp/"
     async with streamablehttp_client(url) as (read, write, _):
         async with ClientSession(read, write) as session:
             # await session.initialize()            # JSON-RPC „initialize“

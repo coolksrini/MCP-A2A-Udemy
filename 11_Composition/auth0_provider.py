@@ -1,8 +1,13 @@
 import httpx
 from jose import jwt as jose_jwt
-from mcp.server.auth.provider import OAuthAuthorizationServerProvider
+from mcp.server.auth.provider import (
+    AccessToken,
+    AuthorizationCode,
+    OAuthAuthorizationServerProvider,
+    RefreshToken,
+)
 from mcp.shared.auth import OAuthClientInformationFull
-from mcp.server.auth.provider import AccessToken, AuthorizationCode, RefreshToken
+
 
 class Auth0Provider(
     OAuthAuthorizationServerProvider[AuthorizationCode, RefreshToken, AccessToken]

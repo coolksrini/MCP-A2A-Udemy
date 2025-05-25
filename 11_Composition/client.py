@@ -1,26 +1,24 @@
 import asyncio
-import httpx
+import os
 
+import httpx
 from fastmcp import Client
 from fastmcp.client.transports import StreamableHttpTransport
 from mcp import McpError
-import os
 
 AUTH0_DOMAIN = os.environ["AUTH0_DOMAIN"]
-API_AUDIENCE = os.environ["API_AUDIENCE", "http://localhost:3000/mcp"] 
-AUTH0_DOMAIN          = os.environ["AUTH0_DOMAIN"]
-API_AUDIENCE          = os.environ["API_AUDIENCE"]
-ADMIN_CLIENT_ID       = os.environ["AUTH0_CLIENT_ID"]
-ADMIN_CLIENT_SECRET   = os.environ["AUTH0_CLIENT_SECRET"]
-PRAKTIKANT_CLIENT_ID  = os.environ["PRAKTIKANT_CLIENT_ID"]
+API_AUDIENCE = os.environ["API_AUDIENCE", "http://localhost:3000/mcp"]
+AUTH0_DOMAIN = os.environ["AUTH0_DOMAIN"]
+API_AUDIENCE = os.environ["API_AUDIENCE"]
+ADMIN_CLIENT_ID = os.environ["AUTH0_CLIENT_ID"]
+ADMIN_CLIENT_SECRET = os.environ["AUTH0_CLIENT_SECRET"]
+PRAKTIKANT_CLIENT_ID = os.environ["PRAKTIKANT_CLIENT_ID"]
 PRAKTIKANT_CLIENT_SECRET = os.environ["PRAKTIKANT_CLIENT_SECRET"]
 
 
-
-
-
-
-async def get_auth0_token(client_name: str, client_id: str, client_secret: str) -> str | None:
+async def get_auth0_token(
+    client_name: str, client_id: str, client_secret: str
+) -> str | None:
     """
     Request an access token from Auth0 using the Client Credentials Grant.
     """
@@ -50,7 +48,9 @@ async def get_auth0_token(client_name: str, client_id: str, client_secret: str) 
             print(f"[{client_name}] Token request failed (HTTP {status}).")
             try:
                 error_info = e.response.json()
-                print(f"[{client_name}] Auth0 error: {error_info.get('error_description', e.response.text)}")
+                print(
+                    f"[{client_name}] Auth0 error: {error_info.get('error_description', e.response.text)}"
+                )
             except Exception:
                 print(f"[{client_name}] Response text: {e.response.text}")
             return None
@@ -59,7 +59,13 @@ async def get_auth0_token(client_name: str, client_id: str, client_secret: str) 
             return None
 
 
-async def test_tool_call(client: Client, client_name: str, tool_name: str, params: dict, expected_success: bool):
+async def test_tool_call(
+    client: Client,
+    client_name: str,
+    tool_name: str,
+    params: dict,
+    expected_success: bool,
+):
     """
     Test a tool call and print the result or error.
     """
@@ -71,10 +77,18 @@ async def test_tool_call(client: Client, client_name: str, tool_name: str, param
             print(f"[{client_name}] Warning: call succeeded but failure was expected.")
     except McpError as e:
         if expected_success:
-            print(f"[{client_name}] Error: {tool_name} failed unexpectedly: {e.message} (code={e.code}, type={e.type})")
+            print(
+                f"[{client_name}] Error: {tool_name} failed unexpectedly: {e.message} (code={e.code}, type={e.type})"
+            )
         else:
-            print(f"[{client_name}] Expected failure: {tool_name} failed: {e.message} (code={e.code}, type={e.type})")
-            if e.code == 403 or (e.type and "forbidden" in e.type.lower()) or (e.type and "insufficient_scope" in e.type.lower()):
+            print(
+                f"[{client_name}] Expected failure: {tool_name} failed: {e.message} (code={e.code}, type={e.type})"
+            )
+            if (
+                e.code == 403
+                or (e.type and "forbidden" in e.type.lower())
+                or (e.type and "insufficient_scope" in e.type.lower())
+            ):
                 print(f"[{client_name}] Insufficient permissions detected.")
             else:
                 print(f"[{client_name}] Unexpected MCP error. Details: {e}")
@@ -92,8 +106,7 @@ async def run_tests_for_client(client_name: str, token: str):
         return
 
     transport = StreamableHttpTransport(
-        url="http://127.0.0.1:3000/mcp",
-        headers={"Authorization": f"Bearer {token}"}
+        url="http://127.0.0.1:3000/mcp/", headers={"Authorization": f"Bearer {token}"}
     )
     mcp_client = Client(transport)
     async with mcp_client:

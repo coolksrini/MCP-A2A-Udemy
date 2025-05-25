@@ -1,17 +1,19 @@
 import asyncio
+
 from dotenv import load_dotenv
+from langchain_core.messages import AIMessage
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.prebuilt import create_react_agent
-from langchain_core.messages import AIMessage
 
 load_dotenv()
+
 
 async def main():
     client = MultiServerMCPClient(
         {
             "weather": {
                 "transport": "streamable_http",
-                "url": "http://127.0.0.1:3000/mcp",
+                "url": "http://127.0.0.1:3000/mcp/",
             }
         }
     )
@@ -30,6 +32,7 @@ async def main():
             break
     else:
         print("No AIMessage found.")
+
 
 if __name__ == "__main__":
     asyncio.run(main())
