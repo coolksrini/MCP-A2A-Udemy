@@ -8,7 +8,7 @@ from mcp.client.stdio import StdioServerParameters, stdio_client
 async def main() -> None:
     server_params = StdioServerParameters(
         command=sys.executable,
-        args=["server_stdio.py"],
+        args=["server.py"],
         env=None,
     )
 
