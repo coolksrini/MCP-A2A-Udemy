@@ -57,5 +57,7 @@ if __name__ == "__main__":
     print("Starting MainAppServer with mounted services.")
     print(f"AddService requires scopes: {add_scopes}")
     print(f"DeleteService requires scopes: {delete_scopes}")
-    print(f"Auth0 Provider configured for domain: {AUTH0_DOMAIN}, audience: {API_AUD}")
+    print(
+        f"Auth0 Provider configured for domain: {AUTH0_DOMAIN}, audience: {API_AUDIENCE}"
+    )
     main_mcp.run(transport="streamable-http", host="127.0.0.1", port=3000)
