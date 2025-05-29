@@ -7,12 +7,8 @@ SERVER = "http://127.0.0.1:8000/mcp/"
 
 
 async def main() -> None:
-    async with streamablehttp_client(SERVER) as (read, write, get_sid):
+    async with streamablehttp_client(SERVER) as (read, write, _):
         async with ClientSession(read, write) as session:
-            print("Session ID (stateless, refreshed each call):", get_sid())
-
-            await session.send_ping()
-            print("Ping OK")
 
             resources = await session.list_resources()
             print("Resources:", [r.uri for r in resources.resources])
