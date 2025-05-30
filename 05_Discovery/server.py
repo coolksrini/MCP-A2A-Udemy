@@ -1,55 +1,42 @@
-import asyncio
-
+import asyncio, re
+from typing import Callable
 from fastmcp import Context, FastMCP
 
+mcp = FastMCP(name="Dynamic-Tool-Router Demo")
 
-class DynamicToolProvider:
-    @classmethod
-    def dynamic_method(cls, text: str) -> str:
-        return f"Dynamic tool processed: {text.upper()}"
+async def to_upper(text: str) -> str:
+    return text.upper()
 
+async def count_words(text: str) -> int:
+    await asyncio.sleep(0)
+    return len(re.findall(r"\w+", text))
 
-mcp = FastMCP(name="Progress Demo Server")
+TOOLS: dict[str, tuple[Callable, str, str]] = {
+    "uppercase": (to_upper, "upper_tool", "Convert text to uppercase."),
+    "wordcount": (count_words, "wordcount_tool", "Count words in the text."),
+}
 
+def classify(text: str) -> str | None:
+    if re.fullmatch(r"[A-ZÄÖÜÊẞ ]+", text):
+        return "wordcount"
+    if "words" in text.lower() or "count" in text.lower():
+        return "wordcount"
+    if text.islower() or "upper" in text.lower():
+        return "uppercase"
+    return None
 
 @mcp.tool(
-    name="process_items",
-    description="Processes a list of items with progress updates and dynamic tool modification",
+    name="router",
+    description="Classifies text, registers the appropriate tool, executes it, and returns the result."
 )
-async def process_items(items: list[str], ctx: Context) -> list[str]:
-    total = len(items)
-    results: list[str] = []
-    await ctx.info(f"Starting processing of {total} items.")
-    for i, item in enumerate(items, start=1):
-        await ctx.info(f"Processing item {i}/{total}: {item}")
-        await ctx.report_progress(progress=i, total=total)
-        await asyncio.sleep(0.5)
-        results.append(item.upper())
-
-    await ctx.info("Item processing completed.")
-    await asyncio.sleep(1)
-
-    tool_name_dynamic = "dynamic_tool_on_the_fly"
-    await ctx.info(f"Adding dynamic tool: '{tool_name_dynamic}'")
-    ctx.fastmcp.add_tool(DynamicToolProvider.dynamic_method, name=tool_name_dynamic)
-
-    await asyncio.sleep(3)
-
-    await ctx.info(f"Attempting to remove dynamic tool: '{tool_name_dynamic}'")
-    try:
-        ctx.fastmcp.remove_tool(tool_name_dynamic)
-        await ctx.info(f"Dynamic tool '{tool_name_dynamic}' removed successfully.")
-    except AttributeError:
-        await ctx.error(
-            "Error: 'remove_tool' is not available in this FastMCP version. Please use FastMCP >= 2.3.4."
-        )
-    except Exception as e:
-        await ctx.error(
-            f"Unexpected error while removing tool '{tool_name_dynamic}': {e}"
-        )
-
-    return results
-
+async def router(text: str, ctx: Context):
+    category = classify(text) or "uppercase"
+    fn, tool_name, desc = TOOLS[category]
+    ctx.fastmcp.add_tool(fn, name=tool_name, description=desc)
+    result = await fn(text)
+    await ctx.info(f"Result from {tool_name}: {result!r}")
+    # await ctx.fastmcp.remove_tool(tool_name)  # remove the tool again if desired
+    return result
 
 if __name__ == "__main__":
     mcp.run(transport="streamable-http", port=8000)
