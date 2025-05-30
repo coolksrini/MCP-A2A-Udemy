@@ -14,7 +14,7 @@ async def main():
 
     roots = [
         # f"file://{docs_root}",
-        # f"file://{project_root}",
+        f"file://{project_root}",
     ]
 
     client = Client(transport, roots=roots)
