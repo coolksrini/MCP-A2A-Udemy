@@ -26,6 +26,7 @@ async def main():
     result = await agent.ainvoke({"messages": question})
 
     messages = result["messages"]
+    print("ALL MESSAGES:", messages)
     for msg in reversed(messages):
         if isinstance(msg, AIMessage):
             print("Agent response:", msg.content)

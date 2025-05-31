@@ -5,7 +5,7 @@ from fastmcp import FastMCP
 from mcp.server.auth.settings import AuthSettings
 
 AUTH0_DOMAIN = os.environ["AUTH0_DOMAIN"]
-API_AUDIENCE = os.environ["API_AUDIENCE", "http://localhost:3000/mcp"]
+API_AUDIENCE = os.environ["API_AUDIENCE", "http://localhost:8000/mcp"]
 REQUIRED_SCOPES = ["read:add"]
 
 provider = Auth0Provider(AUTH0_DOMAIN, API_AUDIENCE)
