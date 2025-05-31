@@ -5,17 +5,21 @@ import httpx
 from fastmcp import Client
 from fastmcp.client.transports import StreamableHttpTransport
 
+from dotenv import load_dotenv
+load_dotenv()
+
 AUTH0_DOMAIN = os.environ["AUTH0_DOMAIN"]
 AUTH0_CLIENT_ID = os.environ["AUTH0_CLIENT_ID"]
 AUTH0_CLIENT_SECRET = os.environ["AUTH0_CLIENT_SECRET"]
-API_AUDIENCE = os.environ["API_AUDIENCE", "http://localhost:3000/mcp"]
+API_AUDIENCE = os.environ.get("API_AUDIENCE", "http://localhost:8000/mcp")
 
 
 async def get_auth0_token() -> str:
     """
     Request an access token from Auth0 using the Client Credentials Grant.
     """
-    token_url = f"https://{AUTH0_DOMAIN}/oauth/token"
+    token_url = f"{AUTH0_DOMAIN}/oauth/token"
+    print("DEBUG: token_url =", repr(token_url))
     payload = {
         "grant_type": "client_credentials",
         "client_id": AUTH0_CLIENT_ID,
@@ -34,7 +38,7 @@ async def main():
     print("Got Auth0 token:", token)
 
     transport = StreamableHttpTransport(
-        url="http://127.0.0.1:3000/mcp/", headers={"Authorization": f"Bearer {token}"}
+        url=API_AUDIENCE, headers={"Authorization": f"Bearer {token}"}
     )
 
     client = Client(transport)

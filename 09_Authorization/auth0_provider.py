@@ -13,8 +13,9 @@ class Auth0Provider(
     OAuthAuthorizationServerProvider[AuthorizationCode, RefreshToken, AccessToken]
 ):
     def __init__(self, domain: str, audience: str):
-        self.jwks_url = f"https://{domain}/.well-known/jwks.json"
-        self.issuer = f"https://{domain}/"
+        canonical = domain.rstrip("/") + "/"
+        self.issuer  = canonical
+        self.jwks_url = f"{canonical}.well-known/jwks.json"
         self.audience = audience
         self._jwks = None
 
