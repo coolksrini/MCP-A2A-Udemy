@@ -36,7 +36,7 @@ async def sampling_handler(
 
 
 async def main():
-    transport = StreamableHttpTransport(url="http://127.0.0.1:3000/mcp/")
+    transport = StreamableHttpTransport(url="http://127.0.0.1:8000/mcp/")
     client = Client(transport, sampling_handler=sampling_handler)
 
     # Example function code for which we want a docstring
