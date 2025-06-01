@@ -5,13 +5,13 @@ from fastmcp import FastMCP
 from mcp.server.auth.settings import AuthSettings
 
 AUTH0_DOMAIN = os.environ["AUTH0_DOMAIN"]
-API_AUDIENCE = os.environ["API_AUDIENCE", "http://localhost:3000/mcp"]
+API_AUDIENCE = os.environ["API_AUDIENCE", "http://localhost:8000/mcp"]
 
 auth0_provider = Auth0Provider(AUTH0_DOMAIN, API_AUDIENCE)
 
 add_scopes = ["read:add"]
 add_auth_settings = AuthSettings(
-    issuer_url=f"https://{AUTH0_DOMAIN}/", required_scopes=add_scopes
+    issuer_url=AUTH0_DOMAIN, required_scopes=add_scopes
 )
 add_server = FastMCP(
     name="AddService",
@@ -29,7 +29,7 @@ def add(a: int, b: int) -> int:
 
 delete_scopes = ["delete:database"]
 delete_auth_settings = AuthSettings(
-    issuer_url=f"https://{AUTH0_DOMAIN}/", required_scopes=delete_scopes
+    issuer_url=AUTH0_DOMAIN, required_scopes=delete_scopes
 )
 delete_server = FastMCP(
     name="DeleteService",
@@ -60,4 +60,4 @@ if __name__ == "__main__":
     print(
         f"Auth0 Provider configured for domain: {AUTH0_DOMAIN}, audience: {API_AUDIENCE}"
     )
-    main_mcp.run(transport="streamable-http", host="127.0.0.1", port=3000)
+    main_mcp.run(transport="streamable-http", host="127.0.0.1", port=8000)

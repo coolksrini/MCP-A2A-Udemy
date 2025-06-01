@@ -7,7 +7,7 @@ from fastmcp.client.transports import StreamableHttpTransport
 from mcp import McpError
 
 AUTH0_DOMAIN = os.environ["AUTH0_DOMAIN"]
-API_AUDIENCE = os.environ["API_AUDIENCE", "http://localhost:3000/mcp"]
+API_AUDIENCE = os.environ["API_AUDIENCE", "http://localhost:8000/mcp"]
 AUTH0_DOMAIN = os.environ["AUTH0_DOMAIN"]
 API_AUDIENCE = os.environ["API_AUDIENCE"]
 ADMIN_CLIENT_ID = os.environ["AUTH0_CLIENT_ID"]
