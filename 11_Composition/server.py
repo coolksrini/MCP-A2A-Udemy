@@ -27,7 +27,7 @@ def add(a: int, b: int) -> int:
     return a + b
 
 
-delete_scopes = ["admin:delete"]
+delete_scopes = ["delete:database"]
 delete_auth_settings = AuthSettings(
     issuer_url=f"https://{AUTH0_DOMAIN}/", required_scopes=delete_scopes
 )
