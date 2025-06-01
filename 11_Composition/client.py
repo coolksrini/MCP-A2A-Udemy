@@ -8,8 +8,6 @@ from mcp import McpError
 
 AUTH0_DOMAIN = os.environ["AUTH0_DOMAIN"]
 API_AUDIENCE = os.environ["API_AUDIENCE", "http://localhost:8000/mcp"]
-AUTH0_DOMAIN = os.environ["AUTH0_DOMAIN"]
-API_AUDIENCE = os.environ["API_AUDIENCE"]
 ADMIN_CLIENT_ID = os.environ["AUTH0_CLIENT_ID"]
 ADMIN_CLIENT_SECRET = os.environ["AUTH0_CLIENT_SECRET"]
 PRAKTIKANT_CLIENT_ID = os.environ["PRAKTIKANT_CLIENT_ID"]
@@ -22,7 +20,7 @@ async def get_auth0_token(
     """
     Request an access token from Auth0 using the Client Credentials Grant.
     """
-    token_url = f"https://{AUTH0_DOMAIN}/oauth/token"
+    token_url = f"{AUTH0_DOMAIN}/oauth/token"
     payload = {
         "grant_type": "client_credentials",
         "client_id": client_id,
@@ -106,7 +104,7 @@ async def run_tests_for_client(client_name: str, token: str):
         return
 
     transport = StreamableHttpTransport(
-        url="http://127.0.0.1:3000/mcp/", headers={"Authorization": f"Bearer {token}"}
+        url="http://127.0.0.1:8000/mcp/", headers={"Authorization": f"Bearer {token}"}
     )
     mcp_client = Client(transport)
     async with mcp_client:
