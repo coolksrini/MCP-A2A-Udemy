@@ -6,6 +6,7 @@ from fastmcp import Client
 from fastmcp.client.transports import StreamableHttpTransport
 
 from dotenv import load_dotenv
+
 load_dotenv()
 
 AUTH0_DOMAIN = os.environ["AUTH0_DOMAIN"]

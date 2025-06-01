@@ -1,24 +1,6 @@
-import os
-
-from auth0_provider import Auth0Provider
 from fastmcp import FastMCP
-from mcp.server.auth.settings import AuthSettings
 
-AUTH0_DOMAIN = os.environ["AUTH0_DOMAIN"]
-API_AUDIENCE = os.environ["API_AUDIENCE", "http://localhost:8000/mcp"]
-
-auth0_provider = Auth0Provider(AUTH0_DOMAIN, API_AUDIENCE)
-
-add_scopes = ["read:add"]
-add_auth_settings = AuthSettings(
-    issuer_url=AUTH0_DOMAIN, required_scopes=add_scopes
-)
-add_server = FastMCP(
-    name="AddService",
-    stateless_http=True,
-    auth_server_provider=auth0_provider,
-    auth=add_auth_settings,
-)
+add_server = FastMCP(name="AddServer")
 
 
 @add_server.tool(description="Add two integers")
@@ -27,37 +9,19 @@ def add(a: int, b: int) -> int:
     return a + b
 
 
-delete_scopes = ["delete:database"]
-delete_auth_settings = AuthSettings(
-    issuer_url=AUTH0_DOMAIN, required_scopes=delete_scopes
-)
-delete_server = FastMCP(
-    name="DeleteService",
-    stateless_http=True,
-    auth_server_provider=auth0_provider,
-    auth=delete_auth_settings,
-)
+subtract_server = FastMCP(name="SubtractServer")
 
 
-@delete_server.tool(description="Simulate deleting an item")
-def delete_item(item_id: str) -> str:
-    print(f"Executing delete_item tool for item_id={item_id}")
-    return f"Item '{item_id}' was 'deleted' successfully."
+@subtract_server.tool(description="Subtract two integers")
+def subtract(a: int, b: int) -> int:
+    print(f"Executing subtract tool with a={a}, b={b}")
+    return a - b
 
 
-main_mcp = FastMCP(
-    name="MainAppServer",
-    stateless_http=True,
-)
+main_app = FastMCP(name="MainApp")
 
-main_mcp.mount("adder", add_server)
-main_mcp.mount("deleter", delete_server)
+main_app.mount("add", add_server)
+main_app.mount("subtract", subtract_server)
 
 if __name__ == "__main__":
-    print("Starting MainAppServer with mounted services.")
-    print(f"AddService requires scopes: {add_scopes}")
-    print(f"DeleteService requires scopes: {delete_scopes}")
-    print(
-        f"Auth0 Provider configured for domain: {AUTH0_DOMAIN}, audience: {API_AUDIENCE}"
-    )
-    main_mcp.run(transport="streamable-http", host="127.0.0.1", port=8000)
+    main_app.run(transport="streamable-http")

@@ -4,8 +4,10 @@ from fastmcp.client.transports import StreamableHttpTransport
 
 SERVER = "http://127.0.0.1:3000/mcp/"
 
+
 def section(title: str):
     print(f"\n{'=' * 10} {title} {'=' * 10}")
+
 
 async def main() -> None:
     async with Client(StreamableHttpTransport(SERVER)) as session:
@@ -37,6 +39,7 @@ async def main() -> None:
         updated_products = await session.read_resource(list_uri)
         section("All Products (After)")
         print(updated_products[0].text)
+
 
 if __name__ == "__main__":
     asyncio.run(main())

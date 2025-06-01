@@ -14,7 +14,7 @@ class Auth0Provider(
 ):
     def __init__(self, domain: str, audience: str):
         canonical = domain.rstrip("/") + "/"
-        self.issuer  = canonical
+        self.issuer = canonical
         self.jwks_url = f"{canonical}.well-known/jwks.json"
         self.audience = audience
         self._jwks = None
