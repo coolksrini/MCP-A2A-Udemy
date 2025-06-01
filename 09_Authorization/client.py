@@ -19,7 +19,6 @@ async def get_auth0_token() -> str:
     Request an access token from Auth0 using the Client Credentials Grant.
     """
     token_url = f"{AUTH0_DOMAIN}/oauth/token"
-    print("DEBUG: token_url =", repr(token_url))
     payload = {
         "grant_type": "client_credentials",
         "client_id": AUTH0_CLIENT_ID,
