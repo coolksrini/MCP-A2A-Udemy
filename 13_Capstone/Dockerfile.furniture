@@ -2,7 +2,7 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-COPY .env furniture_server.py auth0_provider.py /app/
+COPY .env furniture_server.py /app/
 
 RUN pip install --no-cache-dir \
     fastmcp \

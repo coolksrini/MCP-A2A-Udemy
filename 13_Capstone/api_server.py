@@ -4,8 +4,9 @@ from typing import List, Literal
 import uvicorn
 from fastapi import FastAPI, HTTPException, Request
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
-from llm_furniture_agent import FurnitureAgent
 from pydantic import BaseModel, Field
+
+from llm_furniture_agent import FurnitureAgent
 
 
 class ApiMessage(BaseModel):
@@ -21,75 +22,59 @@ class AskResponse(BaseModel):
     answer: str
 
 
-def convert_api_messages_to_langchain(
-    api_messages: List[ApiMessage],
-) -> List[BaseMessage]:
-    lc_messages: List[BaseMessage] = []
-    for msg in api_messages:
-        if msg.role == "human":
-            lc_messages.append(HumanMessage(content=msg.content))
-        elif msg.role == "ai":
-            lc_messages.append(AIMessage(content=msg.content))
-        else:
-            print(
-                f"Warning: Unknown message role '{msg.role}' encountered. Skipping message."
-            )
-    return lc_messages
+def to_langchain(messages: List[ApiMessage]) -> List[BaseMessage]:
+    out: List[BaseMessage] = []
+    for m in messages:
+        if m.role == "human":
+            out.append(HumanMessage(content=m.content))
+        elif m.role == "ai":
+            out.append(AIMessage(content=m.content))
+    return out
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     agent = FurnitureAgent()
-    initialized = await agent.initialize()
-    if initialized:
-        app.state.furniture_agent = agent
-    else:
-        app.state.furniture_agent = None
-
-    yield
-
-    current_agent = getattr(app.state, "furniture_agent", None)
-    if current_agent:
-        await current_agent.close()
+    await agent.initialize()
+    app.state.furniture_agent = agent
+    try:
+        yield
+    finally:
+        await agent.close()
 
 
-app = FastAPI(title="Minimal Furniture Info Agent API with History", lifespan=lifespan)
+app = FastAPI(
+    title="Furniture Info Agent API (with history)",
+    lifespan=lifespan,
+)
 
 
 @app.post("/ask", response_model=AskResponse)
-async def ask_agent_endpoint(
-    request_data: AskWithHistoryRequest, fastapi_request: Request
+async def ask_agent(
+    payload: AskWithHistoryRequest,
+    request: Request,
 ):
-    agent: FurnitureAgent | None = getattr(
-        fastapi_request.app.state, "furniture_agent", None
-    )
+    agent: FurnitureAgent = request.app.state.furniture_agent  # type: ignore
 
-    if not agent or not agent.is_initialized:
+    if not agent.is_initialized:
         raise HTTPException(
             status_code=503,
-            detail="The furniture information assistant is currently unavailable.",
+            detail="Furniture assistant is currently unavailable.",
         )
 
-    if not request_data.messages:
-        raise HTTPException(status_code=400, detail="Messages list cannot be empty.")
-
-    langchain_messages = convert_api_messages_to_langchain(request_data.messages)
-    if not langchain_messages:
-        raise HTTPException(
-            status_code=400,
-            detail="No valid messages provided in the list after conversion.",
-        )
+    lc_msgs = to_langchain(payload.messages)
+    if not lc_msgs:
+        raise HTTPException(status_code=400, detail="No valid messages in request.")
 
     try:
-        answer_content = await agent.ask(langchain_messages)
-        return AskResponse(answer=answer_content)
-    except Exception:
+        answer = await agent.ask(lc_msgs)
+        return AskResponse(answer=answer)
+    except Exception as exc:
         raise HTTPException(
             status_code=500,
-            detail="An internal error occurred while processing your request with the agent.",
-        )
+            detail=f"Internal error while processing request: {exc}",
+        ) from exc
 
 
 if __name__ == "__main__":
-    print("Starting Minimal API server for Furniture Agent with History support...")
-    uvicorn.run("api_server:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("api_server:app", host="0.0.0.0", port=8000)
