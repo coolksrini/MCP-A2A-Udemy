@@ -1,5 +1,6 @@
 import asyncio
 import re
+from fastmcp.tools import Tool
 from typing import Callable
 from fastmcp import Context, FastMCP
 
@@ -38,7 +39,12 @@ def classify(text: str) -> str | None:
 async def router(text: str, ctx: Context):
     category = classify(text) or "uppercase"
     fn, tool_name, desc = TOOLS[category]
-    ctx.fastmcp.add_tool(fn, name=tool_name, description=desc)
+
+    # >= 2.7.0
+    new_tool = Tool.from_function(fn, name=tool_name, description=desc)
+    ctx.fastmcp.add_tool(new_tool)
+
+    # ctx.fastmcp.add_tool(fn, name=tool_name, description=desc) # before 2.7.0
     result = await fn(text)
     await ctx.info(f"Result from {tool_name}: {result!r}")
     # await ctx.fastmcp.remove_tool(tool_name)  # remove the tool again if desired
