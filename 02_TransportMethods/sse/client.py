@@ -3,7 +3,7 @@ import asyncio
 from mcp import ClientSession
 from mcp.client.sse import sse_client
 
-SERVER_URL = "http://127.0.0.1:8000/sse"
+SERVER_URL = "http://127.0.0.1:8005/sse"
 
 
 async def main() -> None:

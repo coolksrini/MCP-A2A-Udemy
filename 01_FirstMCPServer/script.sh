@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-set -euo pipefail
-S=http://127.0.0.1:8000/mcp/
+#set -euo pipefail
+S=http://127.0.0.1:8005/mcp/
 ACCEPT='application/json, text/event-stream'
 CT='application/json'
 

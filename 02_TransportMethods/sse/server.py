@@ -1,6 +1,6 @@
 from mcp.server.fastmcp import FastMCP
 
-mcp = FastMCP("Add SSE Server")
+mcp = FastMCP("Add SSE Server", port=8005)
 
 
 @mcp.tool(description="Add two integers")

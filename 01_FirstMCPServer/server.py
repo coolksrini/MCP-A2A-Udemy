@@ -1,6 +1,6 @@
 from mcp.server.fastmcp import FastMCP
 
-mcp = FastMCP("Demo Server")
+mcp = FastMCP("Demo Server", port=8005)
 
 
 @mcp.tool(description="Add two integers")
